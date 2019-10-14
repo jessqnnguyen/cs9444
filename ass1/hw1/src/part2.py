@@ -41,6 +41,9 @@ class LinearModel:
         a float, but raises a Value error if a boolean, list or numpy array is passed in
         hint: consider np.exp()
         """
+        if (isinstance(x, bool) or isinstance(x, list) or isinstance(x, np.ndarray)):
+            raise ValueError("x cannot be a boolean, list or numpy array")
+        return 1/(1 + np.exp(-x))
 
     def forward(self, inputs):
         """
@@ -49,6 +52,7 @@ class LinearModel:
         inputs is a numpy array. The bias term is the last element in self.weights.
         hint: call the activation function you have implemented above.
         """
+        
 
     @staticmethod
     def loss(prediction, label):
