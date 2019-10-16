@@ -48,11 +48,11 @@ class LinearModel:
     def forward(self, inputs):
         """
         TODO: Implement the forward pass (inference) of a the model.
-
         inputs is a numpy array. The bias term is the last element in self.weights.
         hint: call the activation function you have implemented above.
         """
-        
+        s = inputs[0] * self.weights[0] + inputs[1] * self.weights[1] + self.weights[2]
+        return self.activation(s)
 
     @staticmethod
     def loss(prediction, label):
@@ -60,6 +60,9 @@ class LinearModel:
         TODO: Return the cross entropy for the given prediction and label
         hint: consider using np.log()
         """
+        if prediction == 0:
+            prediction += np.exp(-15)
+        return -label * np.log(prediction) - (1 - label) * np.log(1 - prediction)
 
     @staticmethod
     def error(prediction, label):
@@ -69,6 +72,7 @@ class LinearModel:
         For example, if label= 1 and the prediction was 0.8, return 0.2
                      if label= 0 and the preduction was 0.43 return -0.43
         """
+        return label - prediction
 
     def backward(self, inputs, diff):
         """
@@ -85,6 +89,10 @@ class LinearModel:
 
         Note: Numpy arrays are passed by reference and can be modified in-place
         """
+        self.weights[0] += self.lr * diff * inputs[0]
+        self.weights[1] += self.lr * diff * inputs[1]
+        self.weights[2] += self.lr * diff
+        
 
     def plot(self, inputs, marker):
         """
