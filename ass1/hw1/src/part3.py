@@ -104,6 +104,32 @@ class NNModel:
 
            2) An int 8x8 numpy array of labels corresponding to this tiling
         """
+        first_batch = next(iter(self.trainloader))
+        output_images = np.zeros([224, 224])
+        output_labels = np.zeros([8, 8])
+        images = first_batch[0] # torch.Size([64, 1, 28, 28])
+        labels = first_batch[1] # torch.Size([64])
+        row = 0
+        column = 0
+        for i in range(0, 64):
+            image = images[i][0]
+            output_labels[row][column] = labels[i] 
+            if column == 0:
+                y = 0
+            else:
+                y = (28 * column)
+            if row == 0:
+                x = 0
+            else:
+                x = (28 * row)
+            print(f"{x}:{x+28}, {y}:{y+28}")
+            output_images[x:x+28,y:y+28] = image[0:28, 0:28]
+            column += 1
+            if column == 8:
+                row += 1
+                column = 0
+        return (output_images, output_labels)
+        
 
     def train_step(self):
         """
