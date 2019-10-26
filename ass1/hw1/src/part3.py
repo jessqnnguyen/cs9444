@@ -31,7 +31,6 @@ class Linear(nn.Module):
 
     def forward(self, x):
         x = x.view(x.shape[0], -1)  # make sure inputs are flattened
-
         x = F.relu(self.fc1(x))
         x = F.log_softmax(x, dim=1)  # preserve batch dim
 
@@ -43,6 +42,19 @@ class FeedForward(nn.Module):
     TODO: Implement the following network structure
     Linear (256) -> ReLU -> Linear(64) -> ReLU -> Linear(10) -> ReLU-> LogSoftmax
     """
+    def __init__(self):
+        super().__init__()
+        self.fc1 = nn.Linear(784, 256)
+        self.fc2 = nn.Linear(256, 64)
+        self.fc3 = nn.Linear(64, 10)
+    
+    def forward(self, x):
+        x = x.view(x.shape[0], -1)
+        x = F.relu(self.fc1(x))
+        x = F.relu(self.fc2(x))
+        x = F.relu(self.fc3(x))
+        x = F.log_softmax(x, dim=1)
+        return x
 
 
 class CNN(nn.Module):
@@ -57,6 +69,42 @@ class CNN(nn.Module):
     Hint: You will need to reshape outputs from the last conv layer prior to feeding them into
     the linear layers.
     """
+
+    def __init__(self):
+        super().__init__()
+        self.conv1 = nn.Conv2d(1, 10, 5)
+        self.maxpool = nn.MaxPool2d(2, stride=2)
+        self.conv2 = nn.Conv2d(10, 50, 5)
+        self.fc1 = nn.Linear(800, 256)
+        self.fc2 = nn.Linear(256, 10)
+    
+    def forward(self, x):
+        # x.shape = torch.Size([64, 1, 28, 28])
+        # why does c1 take a 4 dimensional input only?
+        x = self.conv1(x)
+        # returns torch.Size([64, 10, 24, 24])
+        # 28 + 1 - 5 = 24
+        # print(f"shape after first convulutional layer = {x.shape}")
+        x = F.relu(x)
+        # print(f"shape after relu {x.shape}")
+        x = self.maxpool(x)
+        # print(f"shape after maxpool = {x.shape}")
+        x = self.conv2(x)
+        # print(f"shape after second convulutional layer = {x.shape}")
+        x = F.relu(x)
+        # print(f"shape after second relu {x.shape}")
+        x = self.maxpool(x)
+        # print(f"shape after second maxpool = {x.shape}")
+        x = x.view(x.shape[0], -1)
+        # print(f"reshape x before feeding to linear = {x.shape}")
+        x = self.fc1(x)
+        # print(f"shape after first linear {x.shape}")
+        x = F.relu(x)
+        # print(f"shape after relu {x.shape}")
+        x = self.fc2(x)
+        x = F.log_softmax(x, dim=1)
+        return x
+
 
 class NNModel:
     def __init__(self, network, learning_rate):
@@ -86,7 +134,10 @@ class NNModel:
         
         Hint: All networks output log-softmax values (i.e. log probabilities or.. likelihoods.). 
         """
-        self.lossfn = None
+        # nn.CrossEntropyLoss combines nn.LogSoftmax() and nn.NLLLoss() in one single class
+        # since F.log_softmax is applied to the prediction of the models is this the correct 
+        # function to use?
+        self.lossfn = nn.NLLLoss()
         self.optimizer = optim.Adam(self.model.parameters(), lr=learning_rate)
 
         self.num_train_samples = len(self.trainloader)
