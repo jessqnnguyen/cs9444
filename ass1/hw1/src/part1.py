@@ -69,15 +69,9 @@ def simple_dot_product(x, y):
     TODO: Implement a function that computes the dot product of
         two rank 1 tensors and returns the result.
     """
-    # TODO: Check dimensions are equal
     if x.ndim != y.ndim:
         raise ValueError("x and y must have the same dimensions.")
-    output = 0
-    for i in range(0,x.numel()):
-        output += x[i]*y[i]
-    # or return x.dot(y)
-    return output
-
+    return x.dot(y)
 
 def simple_matrix_mul(x, y):
     """
@@ -128,7 +122,6 @@ def simple_concatenate(tensors):
     TODO: Implement a function that concatenates the given sequence of tensors
         in the first dimension and returns the result
     """
-    # TODO: Check if the first dimension is 0 or 1
     return torch.cat(tensors, 0)
 
 
